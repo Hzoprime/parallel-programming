@@ -4,7 +4,9 @@
 #include <algorithm>
 #include <cstdlib>
 #include <windows.h>
-const int max_n = 1024;
+#include <fstream>
+const int max_n = 1 << 10;
+const int mod = 1 << 6;
 using namespace std;
 
 void output(int n, float a[max_n][max_n])
@@ -46,7 +48,6 @@ void transpose(int n, float b[max_n][max_n])
 			swap(b[i][j], b[j][i]);
 		}
 	}
-
 }
 
 
@@ -54,6 +55,7 @@ void transpose(int n, float b[max_n][max_n])
 class multiply
 {
 public:
+	ofstream* file;
 	virtual void run(int n, float a[max_n][max_n], float b[max_n][max_n], float c[max_n][max_n]) = 0;
 	virtual char* get_type() = 0;
 };
@@ -63,6 +65,10 @@ class serial : public multiply
 {
 	static char *type;
 public:
+	serial()
+	{
+		file = new ofstream("serial.txt", ios::app);
+	}
 	char* get_type()
 	{
 		return type;
@@ -89,6 +95,10 @@ class cache :public multiply
 {
 	static char *type;
 public:
+	cache()
+	{
+		file = new ofstream("cache.txt", ios::app);
+	}
 	char* get_type()
 	{
 		return type;
@@ -116,6 +126,10 @@ class sse_float :public multiply
 {
 	static char* type;
 public:
+	sse_float()
+	{
+		file = new ofstream("see_float.txt", ios::app);
+	}
 	char* get_type()
 	{
 		return type;
@@ -155,6 +169,10 @@ class sse_tile :public multiply
 	static char* type;
 	static int tile;
 public:
+	sse_tile()
+	{
+		file = new ofstream("sse_tile.txt", ios::app);
+	}
 	char* get_type()
 	{
 		return type;
@@ -228,11 +246,28 @@ public:
 		QueryPerformanceCounter(&head);
 		p_multiply->run(n, a, b, c);
 		QueryPerformanceCounter(&tail);
-		cout << p_multiply->get_type() << ": " << ((float)(tail.QuadPart - head.QuadPart)) / frequency.QuadPart << endl;
+		//cout << p_multiply->get_type() << "    n = " << n << ": " << ((tail.QuadPart - head.QuadPart)) << endl;
+		(*(p_multiply->file)) << p_multiply->get_type() << "    n = " << n << ": " << ((tail.QuadPart - head.QuadPart)) << endl;
 	}
 };
 
+template<typename T>
+void init_rand_mat(int n, T a[max_n][max_n])
+{
+	for (int i = 0; i < n; i++)
+	{
+		for (int j = 0; j < n; j++)
+		{
+			a[i][j] = (float(rand() % mod)) / (float(rand() % mod));
+		}
+	}
+}
 
+template<typename T>
+void init_zero_mat(int n, T a[max_n][max_n])
+{
+	memset(a, 0, sizeof(T)*(max_n)*(max_n));
+}
 
 int main()
 {
@@ -242,47 +277,40 @@ int main()
 	float cache_result[max_n][max_n];
 	float sse_result[max_n][max_n];
 	float sse_tile_result[max_n][max_n];
-	int mod = 1 << 6;
-	for (int i = 0; i < max_n; i++)
-	{
-		for (int j = 0; j < max_n; j++)
-		{
-			a[i][j] = (float(rand() % mod)) / (float(rand() % mod));
-			b[i][j] = (float(rand() % mod)) / (float(rand() % mod));
-			serial_result[i][j] = 0;
-			cache_result[i][j] = 0;
-			sse_result[i][j] = 0;
-			sse_tile_result[i][j] = 0;
-		}
-	}
-	int n = max_n;
+
+	int times = 500;
+	init_rand_mat(max_n, a);
+	init_rand_mat(max_n, b);
+	init_zero_mat(max_n, serial_result);
+	init_zero_mat(max_n, cache_result);
+	init_zero_mat(max_n, sse_result);
+	init_zero_mat(max_n, sse_tile_result);
 
 	serial<float>* serial_multiply = new serial<float>();
 	timer* serial_timer = new timer(serial_multiply);
-	//serial_timer->run(n, a, b, serial_result);
-
 
 
 	cache<float>* cache_multiply = new cache<float>();
 	timer* cache_timer = new timer(cache_multiply);
-	cache_timer->run(n, a, b, cache_result);
-
-
 
 	sse_float* sse_multiply = new sse_float();
 	timer* sse_timer = new timer(sse_multiply);
-	sse_timer->run(n, a, b, sse_result);
 
 	sse_tile* sse_tile_multiply = new sse_tile();
 	timer* sse_tile_timer = new timer(sse_tile_multiply);
-	sse_tile_timer->run(n, a, b, sse_tile_result);
+	for (int n = 1 << 4; n < max_n; n <<= 1)
+	{
+		for (int i = 0; i < times; i++)
+		{
+			serial_timer->run(n, a, b, serial_result);
+			cache_timer->run(n, a, b, cache_result);
+			sse_timer->run(n, a, b, sse_result);
+			sse_tile_timer->run(n, a, b, sse_tile_result);
+		}
+	}
 
-	//cout << compare(n, cache_result, serial_result) << endl;
-	cout << compare(n, sse_tile_result, cache_result) << endl;
+	//cout << compare(n, sse_tile_result, cache_result) << endl;
 
-
-	// __m128 sum;
-	// sum = _mm_setzero_ps();
 	system("pause");
 }
 
