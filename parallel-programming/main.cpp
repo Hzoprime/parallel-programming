@@ -298,6 +298,7 @@ int main()
 
 	sse_tile* sse_tile_multiply = new sse_tile();
 	timer* sse_tile_timer = new timer(sse_tile_multiply);
+
 	for (int n = 1 << 4; n < max_n; n <<= 1)
 	{
 		for (int i = 0; i < times; i++)
@@ -310,7 +311,5 @@ int main()
 	}
 
 	//cout << compare(n, sse_tile_result, cache_result) << endl;
-
-	system("pause");
 }
 
