@@ -113,6 +113,15 @@
   <ItemGroup>
     <ClCompile Include="main.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="multiply.h" />
+    <ClInclude Include="serial.h" />
+    <ClInclude Include="sse_float.h" />
+    <ClInclude Include="sse_tile.h" />
+    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="cache.h" />
+    <ClInclude Include="timer.h" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
