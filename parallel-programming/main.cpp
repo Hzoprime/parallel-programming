@@ -38,9 +38,9 @@ int main()
 	sse_tile* sse_tile_multiply = new sse_tile();
 	timer* sse_tile_timer = new timer(sse_tile_multiply);
 
-	for (int n = 1 << 6; n <= max_n; n <<= 1)
+	for (int n = 1 << 6; n <= max_n; n +=10)
 	{
-		for (int i = 0; i < times; i++)
+		//for (int i = 0; i < times; i++)
 		{
 			init_rand_mat(max_n, a);
 			init_rand_mat(max_n, b);
@@ -54,7 +54,7 @@ int main()
 			cout << compare(n, sse_result, sse_tile_result) << endl;
 			system("pause");
 		}
-		break;
+		//break;
 	}
 
 
