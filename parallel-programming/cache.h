@@ -30,6 +30,11 @@ public:
 		}
 		transpose(n, b);
 	}
+	~cache()
+	{
+		file->close();
+		delete file;
+	}
 };
 
 

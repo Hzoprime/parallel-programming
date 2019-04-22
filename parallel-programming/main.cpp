@@ -13,6 +13,7 @@
 
 int main()
 {
+	int times = 100;
 	float a[max_n][max_n];
 	float b[max_n][max_n];
 	float serial_result[max_n][max_n];
@@ -20,9 +21,6 @@ int main()
 	float sse_result[max_n][max_n];
 	float sse_tile_result[max_n][max_n];
 
-	int times = 100;
-	init_rand_mat(max_n, a);
-	init_rand_mat(max_n, b);
 	init_zero_mat(max_n, serial_result);
 	init_zero_mat(max_n, cache_result);
 	init_zero_mat(max_n, sse_result);
@@ -40,18 +38,25 @@ int main()
 	sse_tile* sse_tile_multiply = new sse_tile();
 	timer* sse_tile_timer = new timer(sse_tile_multiply);
 
-	for (int n = 1 << 4; n < max_n; n <<= 1)
+	for (int n = 1 << 6; n <= max_n; n <<= 1)
 	{
 		for (int i = 0; i < times; i++)
 		{
+			init_rand_mat(max_n, a);
+			init_rand_mat(max_n, b);
+
 			serial_timer->run(n, a, b, serial_result);
 			cache_timer->run(n, a, b, cache_result);
 			sse_timer->run(n, a, b, sse_result);
 			sse_tile_timer->run(n, a, b, sse_tile_result);
+
+			//output(n, sse_tile_result);
+			cout << compare(n, sse_result, sse_tile_result) << endl;
+			system("pause");
 		}
 		break;
 	}
 
-	//cout << compare(n, sse_tile_result, cache_result) << endl;
+
 }
 

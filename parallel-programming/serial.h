@@ -28,7 +28,11 @@ public:
 			}
 		}
 	}
-
+	~serial()
+	{
+		file->close();
+		delete file;
+	}
 };
 
 char* serial::type = "serial";

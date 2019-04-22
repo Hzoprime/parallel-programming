@@ -1,12 +1,12 @@
 com = g++
 program = test
 
-deps = $(shell find . -name "*.h")
-src = $(shell find . -name "*.cpp")
+deps = $(powershell gci . -name "*.h")
+src = $(powershell gci . -name "*.cpp")
 obj = $(src:%.cpp=%.o)
 
 clean:
-	rm -rf *.txt $(obj) $(program)
+	del  *.txt $(obj) $(program)
 
 echo1:
 	echo $(src)
@@ -14,7 +14,7 @@ echo1:
 $(program): $(obj)
 	$(com) -o $(program) $(obj)
 
-%.o : %.c $(deps)
+%.o : $(deps)
 	$(com) -c $< -o $@
 
 	

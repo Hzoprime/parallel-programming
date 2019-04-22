@@ -33,7 +33,7 @@ public:
 				}
 				for (int p = 0; p < n / tile; p++)
 				{
-					for (int i = 0; i < tile; i++)
+				 	for (int i = 0; i < tile; i++)
 					{
 						for (int j = 0; j < tile; j++)
 						{
@@ -41,7 +41,7 @@ public:
 							for (int k = 0; k < tile; k += 4)
 							{
 								t1 = _mm_loadu_ps(a[r*tile + i] + p*tile + k);
-								t2 = _mm_loadu_ps(b[q*tile + i] + p*tile + k);
+								t2 = _mm_loadu_ps(b[q*tile + j] + p*tile + k);
 								t1 = _mm_mul_ps(t1, t2);
 								sum = _mm_add_ps(sum, t1);
 							}
@@ -56,8 +56,13 @@ public:
 		}
 		transpose(n, b);
 	}
+	~sse_tile()
+	{
+		file->close();
+		delete file;
+	}
 };
 
 
 char* sse_tile::type = "sse_tile";
-int sse_tile::tile = 64;
+int sse_tile::tile = 16;

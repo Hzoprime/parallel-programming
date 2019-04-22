@@ -43,6 +43,11 @@ public:
 		}
 		transpose(n, b);
 	}
+	~sse_float()
+	{
+		file->close();
+		delete file;
+	}
 };
 
 

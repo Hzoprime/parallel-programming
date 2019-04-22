@@ -6,7 +6,8 @@
 #include <windows.h>
 #include <fstream>
 const int max_n = 1 << 10;
-const int mod = 1 << 6;
+const int range = 1 << 4;
+const int mod = 1 << 3;
 using namespace std;
 
 void output(int n, float a[max_n][max_n])
@@ -61,7 +62,8 @@ void init_rand_mat(int n, T a[max_n][max_n])
 	{
 		for (int j = 0; j < n; j++)
 		{
-			a[i][j] = (float(rand() % mod)) / (float(rand() % mod));
+			////a[i][j] = (float)(rand() % mod) / (float)(1 + rand() % mod);
+			a[i][j] = (float)(rand()) / (float)RAND_MAX * range;
 		}
 	}
 }
