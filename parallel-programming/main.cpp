@@ -13,7 +13,7 @@
 
 int main()
 {
-	int times = 100;
+	int times = 40;
 	float a[max_n][max_n];
 	float b[max_n][max_n];
 	float serial_result[max_n][max_n];
@@ -40,7 +40,7 @@ int main()
 
 	for (int n = 1 << 6; n <= max_n; n +=10)
 	{
-		//for (int i = 0; i < times; i++)
+		for (int i = 0; i < times; i++)
 		{
 			init_rand_mat(max_n, a);
 			init_rand_mat(max_n, b);
@@ -56,7 +56,5 @@ int main()
 		}
 		//break;
 	}
-
-
 }
 

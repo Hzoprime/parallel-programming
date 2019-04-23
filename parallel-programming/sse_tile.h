@@ -4,9 +4,9 @@
 class sse_tile :public multiply
 {
 	static char* type;
-	static int tile;
+	int tile;
 public:
-	sse_tile()
+	sse_tile(int tile_ = 64) :tile(tile_ - tile_ & 3)
 	{
 		file = new ofstream("sse_tile.txt", ios::app);
 	}
@@ -20,43 +20,35 @@ public:
 		float temp;
 		transpose(n, b);
 
+		for (int i = 0; i < n; i++)
+		{
+			for (int j = 0; j < n; j++)
+			{
+				c[i][j] = 0;
+			}
+		}
+
 		for (int r = 0; r <= n / tile; r++)
 		{
 			for (int q = 0; q <= n / tile; q++)
 			{
-				for (int i = 0; i < tile; i++)
-				{
-					for (int j = 0; j < tile; j++)
-					{
-						if (!(r*tile + i < n && q*tile + j < n))
-						{
-							break;
-						}
-						c[r*tile + i][q*tile + j] = 0.0;
-					}
-				}
-				for (int p = 0; p <= n / tile; p++)
+				for (int p = 0; p < n / tile; p++)
 				{
 					for (int i = 0; i < tile; i++)
 					{
+						if (r*tile + i >= n)
+						{
+							break;
+						}
 						for (int j = 0; j < tile; j++)
 						{
-							if (!(r*tile + i < n && q*tile + j < n))
+							if (q*tile + j >= n)
 							{
 								break;
 							}
 							sum = _mm_setzero_ps();
 							for (int k = tile - 4; k >= 0; k -= 4)
 							{
-								if (p*tile + k + 4 > n)
-								{
-									k = n - p*tile;
-									for (int ik = k % 4 - 1; ik >= 0; ik--)
-									{
-										c[r*tile + i][q*tile + j] += a[r*tile + i][p*tile + ik] * b[q*tile + j][p*tile + ik];
-									}
-									continue;
-								}
 								t1 = _mm_loadu_ps(a[r*tile + i] + p*tile + k);
 								t2 = _mm_loadu_ps(b[q*tile + j] + p*tile + k);
 								t1 = _mm_mul_ps(t1, t2);
@@ -66,7 +58,42 @@ public:
 							sum = _mm_hadd_ps(sum, sum);
 							_mm_store_ss(&temp, sum);
 							c[r*tile + i][q*tile + j] += temp;
+						}
+					}
+				}
+				/*consider p = tile in the loop of r and q*/
+				{
+					int p = n / tile;
+					for (int i = 0; i < tile; i++)
+					{
+						if (r*tile + i >= n)
+						{
+							break;
+						}
+						for (int j = 0; j < tile; j++)
+						{
+							if (q*tile + j >= n)
+							{
+								break;
+							}
+							sum = _mm_setzero_ps();
 
+							for (int l = (n - p*tile) % 4 - 1; l >= 0; l--)
+							{
+								c[r*tile + i][q*tile + j] += a[r*tile + i][p*tile + l] * b[q*tile + j][p*tile + l];
+							}
+
+							for (int k = n - p*tile - 4; k >= 0; k -= 4)
+							{
+								t1 = _mm_loadu_ps(a[r*tile + i] + p*tile + k);
+								t2 = _mm_loadu_ps(b[q*tile + j] + p*tile + k);
+								t1 = _mm_mul_ps(t1, t2);
+								sum = _mm_add_ps(sum, t1);
+							}
+							sum = _mm_hadd_ps(sum, sum);
+							sum = _mm_hadd_ps(sum, sum);
+							_mm_store_ss(&temp, sum);
+							c[r*tile + i][q*tile + j] += temp;
 						}
 					}
 				}
@@ -83,4 +110,3 @@ public:
 
 
 char* sse_tile::type = "sse_tile";
-int sse_tile::tile = 16;
