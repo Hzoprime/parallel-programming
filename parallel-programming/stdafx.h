@@ -5,6 +5,12 @@
 #include <cstdlib>
 #include <windows.h>
 #include <fstream>
+#include <vector>
+#include<string>
+#include <map>
+#include <numeric>
+#include <set>
+#include <functional>
 const int max_n = 1 << 10;
 const int range = 1 << 4;
 const int mod = 1 << 3;
@@ -23,7 +29,7 @@ void output(int n, float a[max_n][max_n])
 	}
 }
 
-
+//Consider the precision
 bool compare(int n, float a[max_n][max_n], float b[max_n][max_n])
 {
 	unsigned long long int count = 0;
@@ -62,7 +68,6 @@ void init_rand_mat(int n, T a[max_n][max_n])
 	{
 		for (int j = 0; j < n; j++)
 		{
-			////a[i][j] = (float)(rand() % mod) / (float)(1 + rand() % mod);
 			a[i][j] = (float)(rand()) / (float)RAND_MAX * range;
 		}
 	}

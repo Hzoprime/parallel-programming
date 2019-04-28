@@ -1,3 +1,6 @@
 x64
 .vs
 *.txt
+data/
+.vscode/
+.editorconfig

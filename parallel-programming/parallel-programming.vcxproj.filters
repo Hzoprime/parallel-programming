@@ -23,22 +23,22 @@
     <ClInclude Include="stdafx.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="multiply.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="serial.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="cache.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="sse_float.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="sse_tile.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="timer.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="serial_matrix.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="sse_float_matrix.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="sse_tile_matrix.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="cache_matrix.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="multiply_matrix.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

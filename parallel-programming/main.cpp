@@ -1,60 +1,99 @@
 #pragma comment(linker, "/STACK:536870912,536870912")
-#include"multiply.h"
+#include"multiply_matrix.h"
 
-#include"serial.h"
-#include"cache.h"
-#include"sse_float.h"
-#include"sse_tile.h"
+#include"serial_matrix.h"
+#include"cache_matrix.h"
+#include"sse_float_matrix.h"
+#include"sse_tile_matrix.h"
 
 #include"timer.h"
 
 
+const int times = 20;
+float a[max_n][max_n];
+float b[max_n][max_n];
+float result[max_n][max_n];
 
-
-int main()
+void test_size()
 {
-	int times = 40;
-	float a[max_n][max_n];
-	float b[max_n][max_n];
-	float serial_result[max_n][max_n];
-	float cache_result[max_n][max_n];
-	float sse_result[max_n][max_n];
-	float sse_tile_result[max_n][max_n];
+	init_zero_mat(max_n, result);
 
-	init_zero_mat(max_n, serial_result);
-	init_zero_mat(max_n, cache_result);
-	init_zero_mat(max_n, sse_result);
-	init_zero_mat(max_n, sse_tile_result);
+	vector<multiply_matrix*> multiply_vector;
+	vector<timer*> timer_vector;
 
-	serial* serial_multiply = new serial();
-	timer* serial_timer = new timer(serial_multiply);
+	multiply_vector.push_back(new serial_matrix);
+	multiply_vector.push_back(new cache_matrix());
+	multiply_vector.push_back(new sse_float_matrix());
+	multiply_vector.push_back(new sse_tile_matrix());
 
-	cache* cache_multiply = new cache();
-	timer* cache_timer = new timer(cache_multiply);
+	for (int i = 0; i < multiply_vector.size(); i++)
+	{
+		timer_vector.push_back(new timer(multiply_vector[i]));
+	}
 
-	sse_float* sse_multiply = new sse_float();
-	timer* sse_timer = new timer(sse_multiply);
+	int increase = 4;
 
-	sse_tile* sse_tile_multiply = new sse_tile();
-	timer* sse_tile_timer = new timer(sse_tile_multiply);
-
-	for (int n = 1 << 6; n <= max_n; n +=10)
+	for (int n = 1 << 6; n <= max_n; n += increase)
 	{
 		for (int i = 0; i < times; i++)
 		{
 			init_rand_mat(max_n, a);
 			init_rand_mat(max_n, b);
-
-			serial_timer->run(n, a, b, serial_result);
-			cache_timer->run(n, a, b, cache_result);
-			sse_timer->run(n, a, b, sse_result);
-			sse_tile_timer->run(n, a, b, sse_tile_result);
-
-			//output(n, sse_tile_result);
-			cout << compare(n, sse_result, sse_tile_result) << endl;
-			system("pause");
+			for (int i = 0; i < timer_vector.size(); i++)
+			{
+				timer_vector[i]->run(n, a, b, result);
+			}
 		}
-		//break;
+		if (n >= (increase) * 16)
+		{
+			increase *= 2;
+		}
+		printf("n = %d\n", n);
 	}
+
+	for (int i = 0; i < timer_vector.size(); i++)
+	{
+		timer_vector[i]->p_multiply->get_performance();
+	}
+
+	for (int i = 0; i < timer_vector.size(); i++)
+	{
+		delete timer_vector[i];
+		delete multiply_vector[i];
+	}
+	timer_vector.clear();
+	multiply_vector.clear();
+}
+
+void test_tile()
+{
+	sse_tile_matrix* sse_tile = new sse_tile_matrix("tile.txt");
+	timer* tile_timer = new timer(sse_tile);
+
+	for (int tile = 1 << 4; tile <= max_n / 2; tile += 16)
+	{
+		sse_tile->tile = tile;
+		for (int i = 0; i < times; i++)
+		{
+			init_rand_mat(max_n, a);
+			init_rand_mat(max_n, b);
+
+			tile_timer->run(max_n, a, b, result);
+		}
+		printf("tile = %d\n", tile);
+	}
+
+	sse_tile->get_performance();
+	delete sse_tile;
+	delete tile_timer;
+	sse_tile = nullptr;
+	tile_timer = nullptr;
+}
+
+int main()
+{
+	cout.setf(ios::fixed);
+	//test_size(); 
+	test_tile();
 }
 

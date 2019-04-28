@@ -1,20 +1,20 @@
 #pragma once
-#include"multiply.h"
+#include"multiply_matrix.h"
 
-class sse_tile :public multiply
+class sse_tile_matrix :public multiply_matrix
 {
 	static char* type;
-	int tile;
 public:
-	sse_tile(int tile_ = 64) :tile(tile_ - tile_ & 3)
+	int tile;
+	sse_tile_matrix(string filename = "sse_tile_matrix.txt", int tile_ = 64) :tile(tile_ - (tile_ & 3)), multiply_matrix(filename)
 	{
-		file = new ofstream("sse_tile.txt", ios::app);
+
 	}
-	char* get_type()
+	void record(const int& n, const long long& head, const long long& tail, const long long& frequency)
 	{
-		return type;
+		(*time)[to_string(n) + " " + to_string(tile)].push_back((((double)(tail)) - ((double)(head))) / (double)(frequency) * 1000);
 	}
-	void run(int n, float a[max_n][max_n], float b[max_n][max_n], float c[max_n][max_n])
+	void run(const int& n, float a[max_n][max_n], float b[max_n][max_n], float c[max_n][max_n])
 	{
 		__m128 t1, t2, sum;
 		float temp;
@@ -101,12 +101,7 @@ public:
 		}
 		transpose(n, b);
 	}
-	~sse_tile()
-	{
-		file->close();
-		delete file;
-	}
 };
 
 
-char* sse_tile::type = "sse_tile";
+char* sse_tile_matrix::type = "sse_tile";

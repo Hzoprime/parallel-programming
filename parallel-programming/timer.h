@@ -1,11 +1,11 @@
 #pragma once
-#include"multiply.h"
+#include"multiply_matrix.h"
 
 class timer
 {
 public:
-	multiply *p_multiply;
-	timer(multiply *p)
+	multiply_matrix *p_multiply;
+	timer(multiply_matrix *p)
 	{
 		p_multiply = p;
 	}
@@ -19,8 +19,6 @@ public:
 		p_multiply->run(n, a, b, c);
 
 		QueryPerformanceCounter(&tail);
-
-		cout << p_multiply->get_type() << "    n = " << n << ": " << ((tail.QuadPart - head.QuadPart)) << endl;
-		(*(p_multiply->file)) << p_multiply->get_type() << "    n = " << n << ": " << ((tail.QuadPart - head.QuadPart)) << endl;
+		p_multiply->record(n, head.QuadPart, tail.QuadPart, frequency.QuadPart);
 	}
 };

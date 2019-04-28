@@ -1,21 +1,20 @@
 #pragma once
-#include"multiply.h"
+#include"multiply_matrix.h"
 
 
-class sse_float :public multiply
+class sse_float_matrix :public multiply_matrix
 {
 public:
 	static char* type;
+	sse_float_matrix(string filename = "sse_float_matrix.txt") :multiply_matrix(filename)
+	{
 
-	sse_float()
-	{
-		file = new ofstream("see_float.txt", ios::app);
 	}
-	char* get_type()
+	void record(const int& n, const long long& head, const long long& tail, const long long& frequency)
 	{
-		return type;
+		(*time)[to_string(n)].push_back((((double)(tail)) - ((double)(head))) / (double)(frequency) * 1000);
 	}
-	void run(int n, float a[max_n][max_n], float b[max_n][max_n], float c[max_n][max_n])
+	void run(const int& n, float a[max_n][max_n], float b[max_n][max_n], float c[max_n][max_n])
 	{
 		__m128 t1, t2, sum;
 		transpose(n, b);
@@ -43,12 +42,7 @@ public:
 		}
 		transpose(n, b);
 	}
-	~sse_float()
-	{
-		file->close();
-		delete file;
-	}
 };
 
 
-char* sse_float::type = "sse_float";
+char* sse_float_matrix::type = "sse_float";
